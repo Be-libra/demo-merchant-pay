@@ -10,37 +10,36 @@ function App() {
 
   const [isConnect, setIsConnect] = useState(false)
 
-  const onPressConnect = async () => {
-    setLoading(true);
+  // const onPressConnect = async () => {
+  //   setLoading(true);
 
-    try {
-      const yourWebUrl = "mysite.com"; // Replace with your domain
-      const deepLink = `https://metamask.app.link/dapp/${yourWebUrl}`;
-      const downloadMetamaskUrl = "https://metamask.io/download.html";
+  //   try {
+  //     const yourWebUrl = "mysite.com"; // Replace with your domain
+  //     const deepLink = `https://metamask.app.link/dapp/${yourWebUrl}`;
+  //     const downloadMetamaskUrl = "https://metamask.io/download.html";
 
-      if (window?.ethereum?.isMetaMask) {
-        // Desktop browser
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-      } else if (mobileCheck()) {
-        // Mobile browser
-        const linker = getLinker(downloadMetamaskUrl);
-        linker.openURL(deepLink);
-      } else {
-        window.open(downloadMetamaskUrl);
-      }
-    } catch (error) {
-      console.log(error);
-      setAddress("");
-    }
-
-    setLoading(false);
-  };
+  //     if (window?.ethereum?.isMetaMask) {
+  //       // Desktop browser
+  //       const accounts = await window.ethereum.request({
+  //         method: "eth_requestAccounts",
+  //       });
+  //     } else if (mobileCheck()) {
+  //       // Mobile browser
+  //       const linker = getLinker(downloadMetamaskUrl);
+  //       linker.openURL(deepLink);
+  //     } else {
+  //       window.open(downloadMetamaskUrl);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     setAddress("");
+  //   }
+  // };
 
   const pay =async() =>{
     try {
-      const yourWebUrl = "mysite.com"; // Replace with your domain
+      const currentURl = window.location.href
+      const yourWebUrl = currentURl.split("https://")[1]
       const deepLink = `https://metamask.app.link/dapp/${yourWebUrl}`;
       const downloadMetamaskUrl = "https://metamask.io/download.html";
       if(mobileCheck()){
@@ -48,6 +47,7 @@ function App() {
         linker.openURL(deepLink);
       }
       const provider = new ethers.BrowserProvider(window.ethereum)
+
 
       // MetaMask requires requesting permission to connect users accounts
       await provider.send("eth_requestAccounts", []);

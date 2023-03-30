@@ -41,7 +41,7 @@ export default function Payment (){
 
     
     const onPay = async() =>{
-        if(!(mobileCheck() && !window.ethereum)){
+        if((mobileCheck() && !window.ethereum)){
             //wallet connect
             try {
                 const connect = walletConnectWagmi.connectAsync;

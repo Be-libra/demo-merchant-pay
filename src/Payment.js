@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useConnect, usePrepareSendTransaction, useSendTransaction, useSigner, useWaitForTransaction } from "wagmi";
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import { WalletConnectLegacyConnector } from 'wagmi/connectors/walletConnectLegacy'
+
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 
 import mobileCheck from "./mobileCheck";
@@ -14,7 +16,7 @@ export default function Payment (){
     const { connectAsync } = useConnect();
     const { data: signer, isError } = useSigner()
     const walletConnectWagmi = useConnect({
-      connector: new WalletConnectConnector({ options: { showQrModal: true, projectId:"cb38f918cf392b9e5e0c5dfbf9cbd0bb" } })
+      connector: new WalletConnectLegacyConnector({ options: { qrcode: true } }),
     });
 
     const [isConnected, setIsConnected] = useState(false)
@@ -39,10 +41,10 @@ export default function Payment (){
 
     
     const onPay = async() =>{
-        if((mobileCheck() && !window.ethereum)){
+        if(!(mobileCheck() && !window.ethereum)){
             //wallet connect
             try {
-                const connect = await walletConnectWagmi.connectAsync;
+                const connect = walletConnectWagmi.connectAsync;
                 const { account, chain } = await connect();
                 console.log(account, chain, "this is connect");
                 setIsConnected(true)

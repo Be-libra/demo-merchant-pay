@@ -8,7 +8,7 @@ import mobileCheck from './mobileCheck';
 
 function App() {
 
-  const [isConnect, setIsConnect] = useState(false)
+  const [isConnect, setIsConnect] = useState("")
 
   // const onPressConnect = async () => {
   //   setLoading(true);
@@ -42,7 +42,7 @@ function App() {
       const yourWebUrl = currentURl.split("https://")[1]
       const deepLink = `https://metamask.app.link/dapp/${yourWebUrl}`;
       const downloadMetamaskUrl = "https://metamask.io/download.html";
-      if(mobileCheck()){
+      if(mobileCheck() && !window?.ethereum){
         const linker = getLinker(downloadMetamaskUrl);
         linker.openURL(deepLink);
       }
@@ -62,10 +62,12 @@ function App() {
         value: ethers.parseEther(".01")
       });
 
+      setIsConnect(tx.hash)
       console.log(tx);
       if(tx){
         await tx.wait();
         console.log(tx);
+        setIsConnect("new hash")
       }
     } catch (error) {
       console.log(error);
@@ -78,6 +80,7 @@ function App() {
         <button onClick={pay}>
           pay
         </button>
+        {isConnect}
       </header>
     </div>
   );

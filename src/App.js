@@ -10,31 +10,6 @@ function App() {
 
   const [isConnect, setIsConnect] = useState("")
 
-  // const onPressConnect = async () => {
-  //   setLoading(true);
-
-  //   try {
-  //     const yourWebUrl = "mysite.com"; // Replace with your domain
-  //     const deepLink = `https://metamask.app.link/dapp/${yourWebUrl}`;
-  //     const downloadMetamaskUrl = "https://metamask.io/download.html";
-
-  //     if (window?.ethereum?.isMetaMask) {
-  //       // Desktop browser
-  //       const accounts = await window.ethereum.request({
-  //         method: "eth_requestAccounts",
-  //       });
-  //     } else if (mobileCheck()) {
-  //       // Mobile browser
-  //       const linker = getLinker(downloadMetamaskUrl);
-  //       linker.openURL(deepLink);
-  //     } else {
-  //       window.open(downloadMetamaskUrl);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     setAddress("");
-  //   }
-  // };
 
   const pay =async() =>{
     try {

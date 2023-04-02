@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import getLinker from './deeplink';
 import mobileCheck from './mobileCheck';
 import { disconnect } from "@wagmi/core";
+import erc20ABI from "./erc20Abi.json"
 
 
 function App() {
@@ -19,7 +20,7 @@ function App() {
     const query_params ={}
     for (const [key, value] of urlParams) {
         console.log(`${key}:${value}`);
-        query_params.key = value
+        query_params[key] = value
     }
 
     setParams(query_params)
@@ -29,7 +30,8 @@ function App() {
 
   const pay =async() =>{
     try {
-      if(!params?.orderId){
+      console.log(params);
+      if(!params?.label){
         setIsConnect("OrderId missing, scan QR again")
         return
       }
@@ -41,7 +43,7 @@ function App() {
         const linker = getLinker(downloadMetamaskUrl);
         linker.openURL(deepLink);
       }
-      const provider = new ethers.providers.Provider(window.ethereum)
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
 
 
       // MetaMask requires requesting permission to connect users accounts
@@ -52,18 +54,32 @@ function App() {
       // For this, you need the account signer...
       const signer = provider.getSigner()
 
-      const tx = await (await signer).sendTransaction({
-        to: params?.recipient,
-        value: params?.amount
-      });
+      if(params?.token !== "0x0000000000000000000000000000000000000000"){
+        const contract = new ethers.Contract(params?.token, erc20ABI, signer)
 
-      setIsConnect(tx.hash)
-      console.log(tx);
-      if(tx){
-        await tx.wait();
-        console.log(tx);
-        setIsConnect("new hash")
+        const tx = await contract.transfer(params?.recipient, params?.amount);
+        setIsConnect(tx.hash)
+        if(tx){
+          await tx.wait()
+          console.log(tx);
+          setIsConnect("Transaction Successful")
+        }
       }
+      else{
+        const tx = await (await signer).sendTransaction({
+          to: params?.recipient,
+          value: params?.amount
+        });
+  
+        setIsConnect(tx.hash)
+        console.log(tx);
+        if(tx){
+          await tx.wait();
+          console.log(tx);
+          setIsConnect("new hash")
+        }
+      }
+
     } catch (error) {
       console.log(error);
     }

@@ -1,18 +1,38 @@
 import logo from './logo.svg';
 import './App.css';
 import {ethers} from "ethers"
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import getLinker from './deeplink';
 import mobileCheck from './mobileCheck';
+import { disconnect } from "@wagmi/core";
 
 
 function App() {
 
   const [isConnect, setIsConnect] = useState("")
+  const [params,setParams] = useState()
 
+  useEffect(()=>{
+    disconnect();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const query_params ={}
+    for (const [key, value] of urlParams) {
+        console.log(`${key}:${value}`);
+        query_params.key = value
+    }
+
+    setParams(query_params)
+},[])
+
+// http://localhost:3000/one-time-payment?amount=1000&recipient=0x485BB49FfCa23b98a625f317CafEdc0C14c95615&chainId=5&label=abc&token=0x485BB49FfCa23b98a625f317CafEdc0C14c95615
 
   const pay =async() =>{
     try {
+      if(!params?.orderId){
+        setIsConnect("OrderId missing, scan QR again")
+        return
+      }
       const currentURl = window.location.href
       const yourWebUrl = currentURl.split("https://")[1]
       const deepLink = `https://metamask.app.link/dapp/${yourWebUrl}`;
@@ -21,7 +41,7 @@ function App() {
         const linker = getLinker(downloadMetamaskUrl);
         linker.openURL(deepLink);
       }
-      const provider = new ethers.BrowserProvider(window.ethereum)
+      const provider = new ethers.providers.Provider(window.ethereum)
 
 
       // MetaMask requires requesting permission to connect users accounts
@@ -33,8 +53,8 @@ function App() {
       const signer = provider.getSigner()
 
       const tx = await (await signer).sendTransaction({
-        to: "0x77BC322f05f1728465428a9788612CFE029EeEC1",
-        value: ethers.parseEther(".01")
+        to: params?.recipient,
+        value: params?.amount
       });
 
       setIsConnect(tx.hash)
